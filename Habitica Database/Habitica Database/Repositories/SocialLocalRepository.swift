@@ -19,6 +19,9 @@ public class SocialLocalRepository: BaseLocalRepository {
             return
         }
         save(object: RealmGroup(group))
+        if let participants = group.quest?.members {
+            removeOldQuestParticipants(groupID: group.id, participants: participants)
+        }
     }
     
     public func save(objectID: String, groupID: String, questState: QuestStateProtocol) {
@@ -267,6 +270,23 @@ public class SocialLocalRepository: BaseLocalRepository {
         if membersToRemove.isEmpty == false {
             updateCall { realm in
                 realm.delete(membersToRemove)
+            }
+        }
+    }
+    
+    private func removeOldQuestParticipants(groupID: String?, participants: [QuestParticipantProtocol]) {
+        let oldParticipants = getRealm()?.objects(RealmQuestParticipant.self).filter("groupID == %@", groupID ?? "")
+        var participantsToRemove = [RealmQuestParticipant]()
+        oldParticipants?.forEach({ (member) in
+            if !participants.contains(where: { (participant) -> Bool in
+                return participant.userID == member.userID
+            }) {
+                participantsToRemove.append(member)
+            }
+        })
+        if participantsToRemove.isEmpty == false {
+            updateCall { realm in
+                realm.delete(participantsToRemove)
             }
         }
     }

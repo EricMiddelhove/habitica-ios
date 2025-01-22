@@ -1,4 +1,6 @@
-New in 3.10:
-- Support for upcoming events and content 
-- Updated avatar customization interface to support new events and content
-- Other various bug fixes and interface improvements
+New in 3.12.3:
+
+- We improved the clarity around leaving Quests and Parties
+- Fixed a bug that prevented accounts from leaving Quests
+- Fixed a crash caused by improperly formatted Markdown in some languages
+- Various other bug fixes and improvements

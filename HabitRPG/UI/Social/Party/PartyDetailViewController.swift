@@ -238,18 +238,25 @@ class PartyDetailViewController: GroupDetailViewController {
             questTitleContentView.imageView.setImagewith(name: "inventory_quest_scroll_\(questState.key ?? "")")
             
             partyQuestView.alpha = 1.0
+            questTitleContentView.imageView.alpha = 1.0
             if questState.active {
                 questTitleSeparator.isHidden = false
                 questInvitationUserView.isHidden = true
                 if questState.members.contains(where: { participant -> Bool in
-                    return participant.userID == inventoryRepository.currentUserId
+                    return participant.userID == inventoryRepository.currentUserId && participant.accepted
                 }) {
-                questTitleContentView.detailLabel.text = L10n.Party.questParticipantCount(questState.members.filter({ (participant) -> Bool in
-                    return participant.accepted
-                }).count)
+                    let count = questState.members.filter({ (participant) -> Bool in
+                        return participant.accepted
+                    }).count
+                    if count == 1 {
+                        questTitleContentView.detailLabel.text = L10n.Party.questParticipantOne
+                    } else {
+                        questTitleContentView.detailLabel.text = L10n.Party.questParticipantCount(count)
+                    }
                 } else {
                     questTitleContentView.detailLabel.text = L10n.Party.questNotParticipating
                     partyQuestView.alpha = 0.5
+                    questTitleContentView.imageView.alpha = 0.5
                 }
             } else {
                 questTitleSeparator.isHidden = true

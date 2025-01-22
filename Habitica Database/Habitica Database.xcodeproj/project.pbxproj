@@ -359,6 +359,7 @@
 				2902795F2057E957006DACB9 /* RealmFAQEntry.swift */,
 				295611192057C93200D9711A /* RealmFood.swift */,
 				2956111F2057D48A00D9711A /* RealmGear.swift */,
+				299CE6342CCA5C6300ABA85C /* RealmGearSet.swift */,
 				2956111D2057C9B100D9711A /* RealmHatchingPotion.swift */,
 				296AC81D20ADDC5900885682 /* RealmInAppReward.swift */,
 				295611172057C8EB00D9711A /* RealmItem.swift */,
@@ -380,7 +381,6 @@
 				295611112056EC5C00D9711A /* RealmSkill.swift */,
 				29DBFEFA20CADB4100DF9CF2 /* RealmSpecialItem.swift */,
 				290279882058344B006DACB9 /* RealmWorldState.swift */,
-				299CE6342CCA5C6300ABA85C /* RealmGearSet.swift */,
 			);
 			path = Content;
 			sourceTree = "<group>";

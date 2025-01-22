@@ -538,6 +538,7 @@
 "leader" = "Leader";
 "party.invited_to_quest" = "%@ invited you to participate in a quest";
 "party.quest_number_responded" = "%d/%d Members responded";
+"party.quest_participant_one" = "1 Participant";
 "party.quest_participant_count" = "%d Participants";
 "party.invitation_no_invitername" = "Someone invited you to join the Party **%@**";
 "party.invitation_invitername" = "**@%@** invited you to join the Party **%@**";

@@ -181,7 +181,7 @@ class QuestDetailViewController: BaseUIViewController {
         
         if group.quest?.leaderID != userRepository.currentUserId {
             leaveButton.isHidden = !(isQuestActive && participants.contains(where: { participant in
-                return participant.userID == userRepository.currentUserId
+                return participant.userID == userRepository.currentUserId && participant.accepted
             }))
         } else {
             leaveButton.isHidden = true
@@ -286,7 +286,9 @@ class QuestDetailViewController: BaseUIViewController {
         let alertController = HabiticaAlertController(title: nil, message: isQuestActive ? L10n.Quests.confirmLeave : L10n.Quests.confirmLeaveNostart)
         alertController.addAction(title: L10n.confirm, style: .default, isMainAction: true, handler: {[weak self] (_) in
             if let groupID = self?.groupID {
-                self?.disposable.inner.add(self?.socialRepository.leaveQuest(groupID: groupID).observeCompleted {})
+                self?.disposable.inner.add(self?.socialRepository.leaveQuest(groupID: groupID).observeCompleted {
+                    self?.navigationController?.popViewController(animated: true)
+                })
             }
         })
         alertController.addCancelAction()

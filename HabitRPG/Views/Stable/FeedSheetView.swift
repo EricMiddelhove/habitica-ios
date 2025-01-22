@@ -9,34 +9,41 @@
 import SwiftUI
 import Habitica_Models
 import Kingfisher
+import ReactiveSwift
 
 private class FeedSheetViewModel: ObservableObject {
     @Published var food: [FoodProtocol] = []
-    @Published var ownedFoods: [String: Int] = [:]
+    var ownedFoods: [String: Int] = [:]
     private let inventoryRepository = InventoryRepository()
     
     init() {
-        inventoryRepository.getOwnedItems(itemType: "food").on(value: { owned in
-            self.ownedFoods = Dictionary(uniqueKeysWithValues: owned.value.map { ($0.key ?? "", $0.numberOwned) })
+        print(self)
+        inventoryRepository.getOwnedItems(itemType: "food").on(value: {[weak self] owned in
+            self?.ownedFoods = Dictionary(uniqueKeysWithValues: owned.value.map { ($0.key ?? "", $0.numberOwned) })
         })
-            .flatMap(.latest, { ownedFood in
-                return self.inventoryRepository.getFood(keys: ownedFood.value.map({ ownedItem in
+            .flatMap(.latest, {[weak self] ownedFood in
+                return self?.inventoryRepository.getFood(keys: ownedFood.value.map({ ownedItem in
                     return ownedItem.key ?? ""
-                }))
+                })) ?? SignalProducer.empty
             })
-            .on(value: { food in
-            self.food = food.value
+            .on(value: {[weak self] food in
+                if self?.food.count != food.value.count {
+                    print("Reloading", self?.food.count, food.value.count)
+                    self?.food = food.value
+                }
         }).start()
     }
 }
 
 struct FeedSheetView: View {
-    @Environment(\.presentationMode) var presentationMode
-    @ObservedObject fileprivate var viewModel = FeedSheetViewModel()
+    @Environment(\.presentationMode)
+    var presentationMode
+    @StateObject fileprivate var viewModel = FeedSheetViewModel()
     let onFeed: (FoodProtocol) -> Void
     var dismissParent: (() -> Void)?
     
     var body: some View {
+        List {
             if viewModel.food.isEmpty {
                 VStack(spacing: 2) {
                     Image(uiImage: Asset.Empty.food.image).padding(.bottom, 16)
@@ -51,46 +58,45 @@ struct FeedSheetView: View {
                         RouterHandler.shared.handle(.market)
                     }
             } else {
-                List {
-                    Section(content: {
-                        ForEach(viewModel.food, id: \.key) { foodItem in
-                            HStack {
-                                Group {
-                                    PixelArtView(name: "Pet_Food_\(foodItem.key ?? "")").frame(width: 68, height: 68)
-                                }.frame(width: 50, height: 50)
-                                Text(foodItem.text ?? "")
-                                    .font(.system(.headline))
-                                Spacer()
-                                Text("\(viewModel.ownedFoods[foodItem.key ?? ""] ?? 0)")
-                                    .font(.system(.subheadline))
-                            }
-                            .listRowSpacing(0)
-                            .listRowInsets(.none)
-                            .onTapGesture {
-                                onFeed(foodItem)
-                                presentationMode.dismiss()
-                            }
+                Section(content: {
+                    ForEach(viewModel.food, id: \.key) { foodItem in
+                        HStack {
+                            Group {
+                                PixelArtView(name: "Pet_Food_\(foodItem.key ?? "")").frame(width: 68, height: 68)
+                            }.frame(width: 50, height: 50)
+                            Text(foodItem.text ?? "")
+                                .font(.system(.headline))
+                            Spacer()
+                            Text("\(viewModel.ownedFoods[foodItem.key ?? ""] ?? 0)")
+                                .font(.system(.subheadline))
                         }
-                    }, footer: {
-                        VStack {
-                            Image(uiImage: Asset.shop.image)
-                            Text(L10n.Items.footerFoodTitle).font(.system(size: 16, weight: .semibold)).foregroundStyle(Color(ThemeService.shared.theme.secondaryTextColor))
-                                .padding(.vertical, 1)
-                            Text(AttributedString(L10n.Items.footerFoodDescription).withHighlightWords(words: L10n.Locations.market)).font(.system(size: 14)).foregroundStyle(Color(ThemeService.shared.theme.ternaryTextColor))
-                        }
-                        .padding(.top, 16)
-                        .multilineTextAlignment(.center)
+                        .listRowSpacing(0)
+                        .listRowInsets(.none)
                         .onTapGesture {
+                            onFeed(foodItem)
                             presentationMode.dismiss()
-                            dismissParent?()
-                            RouterHandler.shared.handle(.market)
                         }
-                    }).listRowBackground(Color(ThemeService.shared.theme.windowBackgroundColor))
-                }
-                .scrollContentBackground(.hidden)
-                .background(Color(ThemeService.shared.theme.contentBackgroundColor))
-                .listStyle(.insetGrouped)
+                    }
+                }, footer: {
+                    VStack {
+                        Image(uiImage: Asset.shop.image)
+                        Text(L10n.Items.footerFoodTitle).font(.system(size: 16, weight: .semibold)).foregroundStyle(Color(ThemeService.shared.theme.secondaryTextColor))
+                            .padding(.vertical, 1)
+                        Text(AttributedString(L10n.Items.footerFoodDescription).withHighlightWords(words: L10n.Locations.market)).font(.system(size: 14)).foregroundStyle(Color(ThemeService.shared.theme.ternaryTextColor))
+                    }
+                    .padding(.top, 16)
+                    .multilineTextAlignment(.center)
+                    .onTapGesture {
+                        presentationMode.dismiss()
+                        dismissParent?()
+                        RouterHandler.shared.handle(.market)
+                    }
+                }).listRowBackground(Color(ThemeService.shared.theme.windowBackgroundColor))
             }
+        }
+        .scrollContentBackground(.hidden)
+        .background(Color(ThemeService.shared.theme.contentBackgroundColor))
+        .listStyle(.insetGrouped)
     }
 }
 

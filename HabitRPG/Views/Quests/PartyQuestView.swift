@@ -184,6 +184,7 @@ class PartyQuestView: UIView {
     
     override var intrinsicContentSize: CGSize {
         layout()
-        return CGSize(width: bounds.size.width, height: backgroundView.frame.origin.y + backgroundView.frame.size.height + 12)
+        let padding: CGFloat = pendingLabel.isHidden ? 12 : 0
+        return CGSize(width: bounds.size.width, height: backgroundView.frame.origin.y + backgroundView.frame.size.height + padding)
     }
 }

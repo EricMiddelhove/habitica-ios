@@ -2255,6 +2255,8 @@ public enum L10n {
     public static func questParticipantCount(_ p1: Int) -> String {
       return L10n.tr("Mainstrings", "party.quest_participant_count", p1)
     }
+    /// 1 Participant
+    public static var questParticipantOne: String { return L10n.tr("Mainstrings", "party.quest_participant_one") }
     /// Remove Member
     public static var removeFromParty: String { return L10n.tr("Mainstrings", "party.remove_from_party") }
     /// Are you sure you want to remove %@ from the Party?
