@@ -29,6 +29,7 @@ class PartyViewController: SplitSocialViewController {
     @IBOutlet weak var leaveLookingForPartySubtitle: UILabel!
     var userDisposable: Disposable?
     private var isSeekingParty = false
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -43,7 +44,10 @@ class PartyViewController: SplitSocialViewController {
         gradient.locations =  [0, 0.4, 1]
         noPartyHeaderBackground.gradient = gradient
         chatViewController?.autocompleteContext = "party"
-        
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(true)
         userDisposable = userRepository.getUser()
             .on(value: {[weak self] user in
                 self?.isSeekingParty = user.party?.seeking != nil

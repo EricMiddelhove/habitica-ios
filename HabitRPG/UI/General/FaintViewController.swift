@@ -176,7 +176,7 @@ struct FaintView: View {
     @State var appear = false
     @State var isReviving = false
     @State var isUsingPerk = false
-    @StateObject fileprivate var viewModel = ViewModel()
+    @ObservedObject fileprivate var viewModel = ViewModel()
     private let positions = (0..<6).map { _ in Int.random(in: 5...50) }
     
     var body: some View {

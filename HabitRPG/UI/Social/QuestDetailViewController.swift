@@ -218,7 +218,11 @@ class QuestDetailViewController: BaseUIViewController {
         participants.forEach { (participant) in
             let view = QuestParticipantView()
             if let member = members.first(where: { (member) -> Bool in
-                return member.id == participant.userID
+                if isQuestActive {
+                    return member.id == participant.userID && participant.accepted
+                } else {
+                    return member.id == participant.userID
+                }
             }) {
                 view.configure(member: member)
             } else {
