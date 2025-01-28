@@ -194,12 +194,16 @@ class QuestDetailViewController: BaseUIViewController {
             }).start())
         }
         
-        let participantCount = group.quest?.members.count ?? 0
         if isQuestActive {
+            let participantCount = group.quest?.members.filter({ participant in
+                return participant.accepted
+            }).count ?? 0
             let attributedText = NSMutableAttributedString(string: L10n.Quests.participantsHeader, attributes: [.foregroundColor: UIColor.gray200])
             attributedText.append(NSAttributedString(string: " \(participantCount)", attributes: [.foregroundColor: UIColor.gray400]))
+            print(attributedText)
             invitationsHeader.attributedText = attributedText
         } else {
+            let participantCount = group.quest?.members.count ?? 0
             let respondedCount = group.quest?.members.filter({ (participant) -> Bool in
                 return participant.responded
             }).count ?? 0
@@ -216,13 +220,12 @@ class QuestDetailViewController: BaseUIViewController {
                 view.removeFromSuperview()
         }
         participants.forEach { (participant) in
+            if isQuestActive && participant.accepted != true {
+                return
+            }
             let view = QuestParticipantView()
             if let member = members.first(where: { (member) -> Bool in
-                if isQuestActive {
-                    return member.id == participant.userID && participant.accepted
-                } else {
-                    return member.id == participant.userID
-                }
+                return member.id == participant.userID
             }) {
                 view.configure(member: member)
             } else {
